@@ -27,6 +27,7 @@ type BurrowExporter struct {
 	skipPartitionMaxOffset     bool
 	skipTotalLag               bool
 	skipTopicPartitionOffset   bool
+	exported                   *exportedSeries
 }
 
 func (be *BurrowExporter) processGroup(cluster, group string) {
@@ -152,6 +153,8 @@ func (be *BurrowExporter) processCluster(cluster string) {
 	}
 
 	wg.Wait()
+
+	be.exported.replace(cluster, groups.ConsumerGroups, topics.Topics)
 }
 
 func (be *BurrowExporter) startPrometheus() {
@@ -235,5 +238,6 @@ func MakeBurrowExporter(burrowUrl string, apiVersion int, metricsAddr string, in
 		skipPartitionMaxOffset:     skipPartitionMaxOffset,
 		skipTotalLag:               skipTotalLag,
 		skipTopicPartitionOffset:   skipTopicPartitionOffset,
+		exported:                   newExportedSeries(),
 	}
 }
